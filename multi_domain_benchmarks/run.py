@@ -1,7 +1,6 @@
 import os
 
 root = './'
-data = 'eccentricity'
 model = 'BlockSONAR' #'SONAR'
 seeds = '30 95 12' # seeds for graph property prediction
 patience = 50 # early stopping patience
