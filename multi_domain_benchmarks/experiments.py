@@ -178,7 +178,7 @@ class Experiment(object):
                     'exp_args': self.exp_args
                 }, self.ckpt_path)
                 print(f'Epoch {epoch} - New best val_metric: {best_losses_n_metrics.val_metric}')
-            print(f'Epoch {epoch} - train_metric: {train_metric}, val_metric: {val_metric}, test_metric: {test_metric}')
+            #print(f'Epoch {epoch} - train_metric: {train_metric}, val_metric: {val_metric}, test_metric: {test_metric}')
 
             if self.patience and epoch - best_epoch > self.patience:
                 break

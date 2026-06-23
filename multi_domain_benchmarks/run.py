@@ -8,7 +8,7 @@ max_epochs = 200
 batch_size = 50
 cpus = 5
 gpus = 1 # 1 GPU per task2
-cuda_id = '0,1,2,3' # GPU IDs for the job
+cuda_id = '3' # GPU IDs for the job
 
 for data in ['questions']: # 'func', 'struct', 'roman_empire, 'amazon_ratings', 'minesweeper', tolokers', 'questions'
     tmp = f'{data}_{model}'

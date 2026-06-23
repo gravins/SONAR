@@ -94,8 +94,10 @@ class EnvArgs(NamedTuple):
     # layer_norm, activation, dropout
     layer_norm: bool
     pre_act_norm: bool
-    residual: bool
-    dropout: float
+    conv_residual: bool
+    mlp_residual: bool
+    conv_dropout: float
+    post_dropout: float
     act_type: ActivationType
 
     # encoder, decoder
@@ -124,7 +126,7 @@ class EnvArgs(NamedTuple):
         if self.dataset_decoders is GPPDecoders.NONE:
             if self.dec_num_layers > 1:
                     mlp_list = (self.dec_num_layers - 1) * [Linear(hid_dim, hid_dim),
-                                                            Dropout(self.dropout), 
+                                                            Dropout(self.post_dropout), 
                                                             self.act_type.nn()]
                     mlp_list = mlp_list + [Linear(hid_dim, self.out_dim)]
                     dec_list = Sequential(*mlp_list)

@@ -125,7 +125,7 @@ class SONARConv(MessagePassing):
                  bias: bool = False) -> None:
 
         super().__init__(aggr = 'add')
-        self.dropout = Dropout(p=0.) ### BE CAREFUL, this is not the one in the constructor
+        self.dropout = Dropout(p=dropout) ### BE CAREFUL, this is not the one in the constructor
         
         self.in_channels = in_channels
         self.edge_channels = edge_channels
@@ -214,7 +214,8 @@ class BlockSONAR(Module):
         self.layer_norm = env_args.layer_norm
         self.activation = env_args.act_type.nn()
         self.aggregate_edge_features = env_args.aggregate_edge_features
-        self.residual = env_args.residual
+        self.conv_residual = env_args.conv_residual
+        self.mlp_residual = env_args.mlp_residual
         self.pre_act_norm = env_args.pre_act_norm
         self.resPerNode = False
         
@@ -247,7 +248,7 @@ class BlockSONAR(Module):
             'use_forcing': self.use_forcing,
             'fix_resistance': self.fix_resistance,
             'bias': self.bias,
-            'dropout': env_args.dropout# TODO, add in-conv dropout
+            'dropout': env_args.conv_dropout
         }
         
         self.convs = []
@@ -265,7 +266,7 @@ class BlockSONAR(Module):
                 )
             )
             self.pre_norms.append(BatchNorm1d(self.hidden_dim) if env_args.layer_norm else Identity(self.hidden_dim))
-            self.dropouts.append(Dropout(p=env_args.dropout))
+            self.dropouts.append(Dropout(p=env_args.post_dropout))
             self.post_norms.append(BatchNorm1d(self.hidden_dim) if env_args.layer_norm else Identity(self.hidden_dim))
             
             
@@ -276,7 +277,6 @@ class BlockSONAR(Module):
         self.pre_norms = ModuleList(self.pre_norms)
         self.initial_layer_norm = BatchNorm1d(self.hidden_dim) if env_args.layer_norm else Identity(self.hidden_dim)
         
-        self.drop_ratio = env_args.dropout
         self.pooling = pool.get()
         # Collect the edge feature aggregator, for now is applied only at the beginning
         self.edge_feature_aggregator = EdgeFeatureAggregator(env_args.hid_dim, use_gradient=True)
@@ -319,14 +319,17 @@ class BlockSONAR(Module):
             x = self.activation(x)
             x = self.dropouts[i](x)
             # Residual connection
-            if self.residual:
+            if self.conv_residual:
                 x = x + x_in
-
+            x_in = x
             # MLP
             x = self.mlps[i](x)
             # Final layer norm
             if self.layer_norm:
                 x = self.post_norms[i](x)
+            # Residual connection
+            if self.mlp_residual:
+                x = x + x_in
 
         x = self.pooling(x, batch=batch)
         x = self.node_decoder(x)  # decoder
