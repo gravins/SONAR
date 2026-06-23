@@ -21,10 +21,10 @@ Please consider citing us
 
   ```cd GraphPropPrep/; ./run.sh ``` for automated runs
 
-  - Graph Transfer Benchmark
- 
-    ``` cd graph_transfer_task; python3 -u run_all.py ```
+- Graph Transfer Benchmark
 
-  - LRGB and Heterophilic tasks
+  ``` cd graph_transfer_task; python3 -u run_all.py ```
+
+- LRGB and Heterophilic tasks
 
   ``` cd multi_domain_benchmarks; python3 run.py ```
