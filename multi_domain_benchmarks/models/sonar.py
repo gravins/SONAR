@@ -305,7 +305,7 @@ class BlockSONAR(Module):
         if not self.aggregate_edge_features and edge_embedding is not None:
             edge_index, edge_embedding = add_remaining_self_loops(edge_index=edge_index, edge_attr=edge_embedding, fill_value=1., )
         # Initial layer norm
-        x = self.initial_layer_norm(x)
+        # x = self.initial_layer_norm(x)
         # Pass through the blocks
         for i in range(self.num_blocks): 
             x_in = x
